@@ -1,6 +1,6 @@
 # cqai-dsh-plugin-research · e研宝
 
-<img src="assets/icon.svg" width="48" height="48" alt="e研宝图标：书页与放大镜" />
+<img src="assets/icon.svg" width="48" height="48" alt="e研宝图标：学士帽" />
 
 独立源码仓库：[cqai-club/cqai-dsh-plugin-research](https://github.com/cqai-club/cqai-dsh-plugin-research)。
 
@@ -39,7 +39,7 @@
 
 从 v0.2.1 起，已安装插件列表通过随包导出的 `locale/en.json`、`locale/zh.json` 显示「e研宝」，并读取 `package.json` 的 `icon` 字段展示本地图标。已有旧版本需要更新插件并重启，npm 包名仍为 `cqai-dsh-plugin-research`。
 
-从 v0.2.2 起，侧边栏和首页数字员工入口也直接复用 `assets/icon.svg`，构建时嵌入客户端，无需远程下载。各入口按宿主提供的尺寸显示相同的蓝色书页与放大镜图形。
+从 v0.2.3 起，侧边栏、首页数字员工入口和已安装列表统一采用学士帽。侧边栏和首页直接复用 `assets/icon.svg`，构建时嵌入客户端，无需远程下载，各入口按宿主提供的尺寸显示。
 
 也可以在 ebao-studio 的 DSH 终端中安装。以下以 `desktop` Profile 为例，其他 Profile 需要替换名称：
 
@@ -77,7 +77,7 @@ npm pack
 
 后台导入文件中的 `description` 保留 Markdown 原文，市场详情页渲染标题、段落、列表、强调、行内代码和安全链接。目录接口通过协议允许的 Unicode 行分隔符传递 Markdown 换行，后台原文保持不变；详情页不会执行原始 HTML 或直接加载 Markdown 里的远程图片。
 
-图标唯一设计源为 `assets/icon.svg`，采用 24 × 24 网格、48 × 48 默认尺寸的透明底蓝色渐变线条，与易宝工坊 imagegen 插件图标风格一致。侧边栏、首页数字员工入口和已安装插件列表使用同一个 SVG，以 data URI 展示，无需访问远程图标。市场目前仅支持光栅图片，使用由该 SVG 导出的 128 × 128 透明 PNG `assets/icon.png`，图形保持一致；两者均随 npm 包打包。后台「图标地址」需指向 PNG 原图的 HTTPS 直链，portal 会通过同域图标代理供易宝工坊读取。
+图标唯一设计源为 `assets/icon.svg`，使用原侧边栏的学士帽图形，采用 24 × 24 网格、48 × 48 默认尺寸的透明底单色线条。侧边栏、首页数字员工入口和已安装插件列表使用同一个 SVG，以 data URI 展示，无需访问远程图标。市场目前仅支持光栅图片，使用由该 SVG 导出的 128 × 128 透明 PNG `assets/icon.png`，图形保持一致；两者均随 npm 包打包。后台「图标地址」需指向 PNG 原图的 HTTPS 直链，portal 会通过同域图标代理供易宝工坊读取。
 
 先验证和发布公开 npm 包，再用有 `plugin:admin` 权限的账号在后台选择「新增插件 → JSON 快速添加」，粘贴导入文件。添加后生成草稿，点击「发布」才会进入公开目录。导入 JSON 不是 portal 的自动 seed 文件，也不会自动修改数据库。
 
