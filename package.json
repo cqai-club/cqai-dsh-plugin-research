@@ -1,6 +1,6 @@
 {
   "name": "cqai-dsh-plugin-research",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "e研宝：把 academic-research-skills 的四套学术技能接成易宝工坊里的数字员工。",
   "icon": "assets/icon.svg",
   "license": "(MIT AND CC-BY-NC-4.0)",
