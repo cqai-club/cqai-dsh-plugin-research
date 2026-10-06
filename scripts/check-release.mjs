@@ -3,12 +3,14 @@ import { readFileSync, existsSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const readJson = (path) => JSON.parse(readFileSync(resolve(root, path), 'utf8'))
 const pkg = readJson('package.json')
 const plugin = readJson('dsh.plugin.json')
 const market = readJson('market/cqai-club-plugin.json')
+const upstream = readJson('assets/academic-research-skills.manifest.json')
 
 assert.equal(pkg.name, 'cqai-dsh-plugin-research')
 assert.match(pkg.version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/u)
@@ -25,6 +27,10 @@ const repositoryUrl = pkg.repository.url.replace(/^git\+/u, '').replace(/\.git$/
 assert.equal(repositoryUrl, 'https://github.com/cqai-club/cqai-dsh-plugin-research')
 assert.equal(market.repositoryUrl, repositoryUrl)
 assert.equal(market.homepageUrl, repositoryUrl)
+assert.equal(pkg.license, '(MIT AND CC-BY-NC-4.0)')
+assert.equal(upstream.revision, '6ab4b03bf70a118a1b3ee7f3263ed9f19031061b')
+assert.equal(upstream.license, 'CC-BY-NC-4.0')
+assert.equal(pkg.scripts.postinstall, undefined, 'Skill installation must not execute a network postinstall')
 
 const patch = pkg.dsh?.bundle?.patch
 assert.equal(typeof patch, 'string')
@@ -41,6 +47,21 @@ assert.equal(packed.status, 0, packed.stderr || packed.stdout)
 const [tarball] = JSON.parse(packed.stdout)
 const files = new Set(tarball.files.map(file => file.path))
 const required = new Set(['package.json', 'dsh.plugin.json', 'README.md', '安装说明.md', 'LICENSE', patch])
+required.add('THIRD_PARTY.md')
+required.add('assets/academic-research-skills.manifest.json')
+for (const file of upstream.files) {
+  const path = `assets/academic-research-skills/${file.path}`
+  required.add(path)
+  const content = readFileSync(resolve(root, path))
+  assert.equal(content.length, file.size, `Upstream file size changed: ${path}`)
+  assert.equal(createHash('sha256').update(content).digest('hex'), file.sha256, `Upstream file changed: ${path}`)
+}
+for (const name of ['deep-research', 'academic-paper', 'academic-paper-reviewer', 'academic-pipeline']) {
+  assert.ok(upstream.files.some(file => file.path === `${name}/SKILL.md`), `Bundled skill is missing: ${name}`)
+}
+for (const name of ['LICENSE', 'NOTICE.md', 'CITATION.cff']) {
+  assert.ok(upstream.files.some(file => file.path === name), `Upstream attribution is missing: ${name}`)
+}
 for (const target of [pkg.main, pkg.types, plugin.main, plugin.client?.main]) {
   if (target) required.add(target)
 }

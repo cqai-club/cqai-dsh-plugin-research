@@ -1,0 +1,2 @@
+# Preserve the pinned upstream bytes on every platform; release checks hash them.
+assets/academic-research-skills/** -text

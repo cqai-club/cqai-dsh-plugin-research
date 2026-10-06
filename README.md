@@ -4,13 +4,13 @@
 
 独立源码仓库：[cqai-club/cqai-dsh-plugin-research](https://github.com/cqai-club/cqai-dsh-plugin-research)。
 
-这是 ebao-studio（易宝工坊）的学术研究工作台：查看四套技能的安装状态、预览技能内容，并复制调用指令到 e宝对话。
+这是 ebao-studio（易宝工坊）的学术研究工作台：查看四套技能的安装状态、预览技能内容，并复制调用指令到 e宝对话。v0.2.0 的 npm 包内置四套学术技能及配套文件，安装插件并重启后即可在当前 Profile 中识别，无需手动另装技能。
 
 ## 功能与前提
 
 插件通过现有 DSH/Cordis 接口注册侧边栏和主面板 `cqai-research`。首页数字员工卡片由桌面 presentation 插件根据侧边栏标签生成。
 
-插件读取当前 Harness 的 `skills` 服务，不包含技能正文。需要另外从 [academic-research-skills](https://github.com/Imbad0202/academic-research-skills) 安装以下技能，并确认当前 Profile 能发现它们：
+插件为当前 Harness 的 `skills` 服务注册内置技能 provider，并读取服务发现结果。内置内容固定来自 [academic-research-skills v3.23.0](https://github.com/Imbad0202/academic-research-skills/tree/6ab4b03bf70a118a1b3ee7f3263ed9f19031061b)，包含以下四套技能及其配套文件：
 
 | 技能 | 用途 |
 | --- | --- |
@@ -19,7 +19,9 @@
 | `academic-paper-reviewer` | 同行评审与方法审查 |
 | `academic-pipeline` | 研究、写作、评审与返修编排 |
 
-缺少技能时工作台会显示未安装。安装或更新技能后，重新打开工作台查看状态，再选择技能、复制调用指令、补充题目并发送到 e宝对话。
+当前项目或用户技能目录中已有的同名技能优先；插件内置版本只补充尚未提供的技能，不覆盖用户文件。安装并重启后，打开工作台确认四套技能已就绪，再选择技能、复制调用指令、补充题目并发送到 e宝对话。若宿主未提供技能服务，插件会等待该服务；目录发现失败时工作台会显示未就绪，不能把这种情况当作已安装成功。
+
+上游版本和提交固定在 npm 包中，不会在启动时自动下载或跟随上游更新。源提交为 `6ab4b03bf70a118a1b3ee7f3263ed9f19031061b`；更新内置内容需要安装后续插件版本。
 
 ## 运行要求
 
@@ -29,9 +31,11 @@
 
 以上是构建与依赖要求；实际桌面和市场兼容性需要安装验收。
 
+四套技能自动识别不等于任务所需工具全部安装。需要运行分析脚本、生成文档或转换格式时，仍应按具体任务准备 Python、相应 Python 包、Pandoc 等工具，并配置模型与检索能力。上游面向 Claude 的 hooks、commands 和多代理控制不会自动映射成 DSH 能力；本插件提供技能内容和工作台入口，不承诺完整复现上游运行环境。
+
 ## 安装
 
-这是由用户选择安装的插件。npm 包发布且 portal 条目上架后，在 ebao-studio 的「插件管理 → 插件市场」选择 `CQAI Club Plugin Market`，搜索 `cqai-dsh-plugin-research` 或「e研宝」并安装，随后重启。
+这是由用户选择安装的插件。v0.2.0 npm 包发布且 portal 条目上架后，在 ebao-studio 的「插件管理 → 插件市场」选择 `CQAI Club Plugin Market`，搜索 `cqai-dsh-plugin-research` 或「e研宝」并安装，随后重启。插件会注册内置四套技能，无需再到上游项目手动安装。
 
 也可以在 ebao-studio 的 DSH 终端中安装。以下以 `desktop` Profile 为例，其他 Profile 需要替换名称：
 
@@ -40,6 +44,8 @@ dsh plugin --profile desktop add cqai-dsh-plugin-research
 ```
 
 本地压缩包安装方法见 [安装说明.md](安装说明.md)。
+
+卸载插件并重启后，内置技能 provider 随插件撤销。插件不会删除项目或用户技能目录中的文件；原有同名技能仍由对应的用户或项目 provider 管理。
 
 ## 独立开发与打包
 
@@ -54,7 +60,7 @@ npm pack
 
 `check` 依次执行类型检查、路由测试和构建。`check:release` 检查 npm 实际打包文件、Host/Client 入口、类型声明、版本一致性、DSH bundle patch 和公开 registry 配置。`npm pack` 的 `prepack` 会重新构建。
 
-`package-lock.json` 固定开发依赖。npm 包仅包含编译产物、DSH 清单、Cordis patch、文档和许可；源码、测试、开发脚本和市场元数据留在开发目录。
+`package-lock.json` 固定开发依赖。npm 包包含编译产物、DSH 清单、Cordis patch、图标、`assets/academic-research-skills/` 下的内置技能及配套文件、文档和许可声明；源码、测试、开发脚本和市场元数据留在开发目录。技能分发范围、固定来源及许可映射见 [THIRD_PARTY.md](THIRD_PARTY.md)。
 
 ## CQAI Club Plugin Market 配置
 
@@ -104,4 +110,6 @@ npm publish --dry-run --access public --registry https://registry.npmjs.org/
 
 ## 许可与归属
 
-插件代码采用 MIT。技能内容来自 Cheng-I Wu 的 academic-research-skills，采用 CC-BY-NC-4.0；内容与版权归原作者所有，使用技能需遵守上游许可。本插件不重新分发技能正文。
+插件代码采用 [MIT](LICENSE)。随包分发的技能及配套内容来自 Cheng-I Wu 的 [academic-research-skills](https://github.com/Imbad0202/academic-research-skills/tree/6ab4b03bf70a118a1b3ee7f3263ed9f19031061b)，固定为 v3.23.0 / `6ab4b03bf70a118a1b3ee7f3263ed9f19031061b`，采用 CC-BY-NC-4.0；其内容和版权归原作者所有。
+
+内置文件保留上游版权、NOTICE 与 CITATION 信息。具体目录、许可映射和分发说明见 [THIRD_PARTY.md](THIRD_PARTY.md)。npm 包整体的许可表达式为 `(MIT AND CC-BY-NC-4.0)`：插件代码的 MIT 许可不替代技能内容的许可，使用和再分发附带内容时需遵守上游署名、非商业使用及其他许可要求。
