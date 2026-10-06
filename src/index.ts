@@ -1,10 +1,9 @@
 /**
  * e研宝 — Host half.
  *
- * Bridges the installed `academic-research-skills` skills into the desktop
- * product: it reads them back from the Harness skill registry and serves a
- * read-only catalog the panel renders. No skill content is vendored here, so
- * the upstream project keeps owning its own text and updates.
+ * Registers the four bundled academic skills in the Harness registry and
+ * serves the read-only workbench catalog. User and project skills keep their
+ * normal precedence over these package-owned, licensed upstream resources.
  *
  * @module cqai-dsh-plugin-research
  */
@@ -12,6 +11,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-host-webserver'
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { registerBundledSkills } from './bundled-skills.ts'
 import {
   RESEARCH_PANEL,
   RESEARCH_SKILLS,
@@ -22,7 +22,7 @@ import {
 } from './catalog.ts'
 
 export const name = 'cqai-research'
-export const inject = ['webServer']
+export const inject = ['webServer', 'skills']
 
 /** Longest skill body the preview route returns, so one request stays bounded. */
 const MAX_PREVIEW_CHARS = 200_000
@@ -30,9 +30,8 @@ const MAX_PREVIEW_CHARS = 200_000
 /**
  * Structural view of the Harness skill registry this plugin reads.
  *
- * Declared locally on purpose: the registry is an optional Host service
- * (`ctx.get('skills')`), so a profile that composes this panel without a skill
- * provider still mounts it and reports the skills as missing.
+ * The Host declares the skills service as a dependency. Discovery failures
+ * still appear in the catalog instead of falsely claiming skills are ready.
  */
 interface SkillSummaryView {
   readonly name: string
@@ -114,6 +113,7 @@ async function readCatalog(ctx: Context): Promise<CatalogPayload> {
 }
 
 export function apply(ctx: Context): void {
+  registerBundledSkills(ctx)
   ctx.effect(() => {
     const disposers: Array<() => void> = []
 

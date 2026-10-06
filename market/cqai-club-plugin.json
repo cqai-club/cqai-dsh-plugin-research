@@ -1,8 +1,8 @@
 {
   "packageName": "cqai-dsh-plugin-research",
   "displayName": "e研宝",
-  "summary": "易宝工坊的学术研究工作台，提供深度研究、论文写作、同行评审和全流程编排入口；需要另外安装 academic-research-skills。",
-  "description": "## e研宝\n\n在 ebao-studio（易宝工坊）中提供学术研究工作台：查看四套学术技能的安装状态、浏览任务模式，并复制技能调用指令到 e宝对话。\n\n### 四套技能\n\n- `deep-research`：深度研究、文献综述、事实核查。\n- `academic-paper`：论文写作、修改、摘要和引用核查。\n- `academic-paper-reviewer`：同行评审、复核和方法审查。\n- `academic-pipeline`：研究、写作、评审与返修的全流程编排。\n\n### 安装与使用\n\n本插件只提供工作台和技能目录，不打包技能正文。请另外从 [academic-research-skills](https://github.com/Imbad0202/academic-research-skills) 安装以上四套技能，确保当前 Harness Profile 能识别它们。\n\n安装插件后重启 ebao-studio，打开侧边栏「e研宝」。确认四套技能已就绪，选择技能并复制调用指令，补充研究题目后发送到 e宝对话。\n\n### 兼容性\n\n目标宿主为 ebao-studio 桌面版。API 兼容版本及宿主兼容范围尚待实际市场安装验收，本条目暂不声明已验证的兼容范围。\n\n### 许可与归属\n\n插件代码采用 MIT 许可。技能内容来自 Cheng-I Wu 的 academic-research-skills，采用 CC-BY-NC-4.0 许可，内容与版权归原作者所有；使用技能内容需遵守上游许可。",
+  "summary": "易宝工坊的学术研究工作台，内置深度研究、论文写作、同行评审和全流程编排四套技能；安装插件并重启后自动识别，无需手动另装技能。",
+  "description": "## e研宝\n\n在 ebao-studio（易宝工坊）中提供学术研究工作台：查看四套学术技能的安装状态、预览技能内容，并复制调用指令到 e宝对话。v0.2.0 安装包内置技能及配套文件，无需手动另装。\n\n### 四套技能\n\n- `deep-research`：深度研究、文献综述、事实核查。\n- `academic-paper`：论文写作、修改、摘要和引用核查。\n- `academic-paper-reviewer`：同行评审、复核和方法审查。\n- `academic-pipeline`：研究、写作、评审与返修的全流程编排。\n\n### 安装与使用\n\n1. 从插件市场安装 e研宝 v0.2.0，随后重启易宝工坊。\n2. 打开侧边栏「e研宝」，确认当前 Profile 已识别四套技能。\n3. 选择技能并复制调用指令，补充研究题目后发送到 e宝对话。\n\n用户或项目中已有的同名技能优先；内置版本只补充尚未提供的技能，不覆盖用户文件。卸载插件并重启后，内置 provider 自动撤销，不删除用户或项目技能文件。\n\n### 工具与兼容性\n\nPython、相应 Python 包、Pandoc 等工具按具体任务另行准备，模型与检索能力也需由宿主提供。上游 Claude 的 hooks、commands 和多代理控制不自动映射到 DSH，本插件不承诺完整复现上游运行环境。\n\n目标宿主为易宝工坊桌面版；具体版本兼容性及实际任务工具仍需安装验收。\n\n### 来源与许可\n\n内置内容固定来自 Cheng-I Wu 的 [academic-research-skills v3.23.0](https://github.com/Imbad0202/academic-research-skills/tree/6ab4b03bf70a118a1b3ee7f3263ed9f19031061b)，随 npm 包分发四套技能及配套文件，不在启动时自动下载上游更新。\n\n插件代码采用 MIT 许可；内置技能及配套文件采用 CC-BY-NC-4.0，内容和版权归原作者所有，并保留上游版权、NOTICE 和 CITATION 信息。包整体许可表达式为 `(MIT AND CC-BY-NC-4.0)`。目录、许可映射与分发说明见源码仓库中的 [THIRD_PARTY.md](https://github.com/cqai-club/cqai-dsh-plugin-research/blob/main/THIRD_PARTY.md)。使用附带技能内容时需遵守上游署名、非商业使用及其他许可要求。",
   "categories": [
     "tools",
     "workflow"

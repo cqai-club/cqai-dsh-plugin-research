@@ -18,6 +18,8 @@ export const UPSTREAM = {
   author: 'Cheng-I Wu',
   url: 'https://github.com/Imbad0202/academic-research-skills',
   license: 'CC-BY-NC-4.0',
+  version: '3.23.0',
+  revision: '6ab4b03bf70a118a1b3ee7f3263ed9f19031061b',
 } as const
 
 export interface ResearchSkill {
@@ -36,21 +38,21 @@ export const RESEARCH_SKILLS: readonly ResearchSkill[] = [
   {
     name: 'deep-research',
     title: '深度研究',
-    summary: '13 个智能体把选题收敛成可引用的研究底稿：问题界定、方法设计、系统性检索、交叉核验与偏倚评估。',
+    summary: '按上游研究流程组织问题界定、方法设计、系统性检索、交叉核验与偏倚评估，形成可引用的研究底稿。',
     modes: ['full', 'quick', 'paper-review', 'lit-review', 'fact-check', 'three-way', 'socratic', 'systematic'],
     triggers: ['深度研究', '文献综述', '系统性综述', '事实核查', 'deep research'],
   },
   {
     name: 'academic-paper',
     title: '论文写作',
-    summary: '12 个智能体覆盖从提纲到成稿：撰写、修改、摘要、引用核查、格式转换与投稿信。',
+    summary: '从提纲到成稿的写作流程：撰写、修改、摘要、引用核查、格式转换与投稿信。',
     modes: ['full', 'plan', 'outline', 'revision', 'abstract', 'lit-review', 'format-convert', 'citation-check', 'disclosure', 'rebuttal-audit'],
     triggers: ['写论文', '帮我写文献综述', '检查引用', '修改论文', '投稿信', '摘要'],
   },
   {
     name: 'academic-paper-reviewer',
     title: '同行评审',
-    summary: '五个席位分工的评审小组（期刊匹配 + 三位同行 + 反方），支持全文评审、复核与校准。',
+    summary: '提供期刊匹配、同行与反方等评审视角，支持全文评审、复核与校准。',
     modes: ['full', 're-review', 'quick', 'methodology', 'socratic', 'calibration'],
     triggers: ['审稿', '同行评审', '模拟评审', '审阅我的论文', 'review my paper'],
   },

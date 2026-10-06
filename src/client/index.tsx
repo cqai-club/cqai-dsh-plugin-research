@@ -95,7 +95,7 @@ function ResearchPanel() {
           <p>学术研究数字员工。选定技能后，把你想做的题目补在指令后面发给 e宝，研究、写作、评审到返修都能接着走。</p>
         </div>
         <span className="cqaiResearch-badge" data-state={installedCount === skills.length ? 'ready' : 'missing'}>
-          {installedCount === skills.length ? '技能已就绪' : `已就绪 ${installedCount}/${skills.length}`}
+          {installedCount === skills.length ? `技能已就绪 ${installedCount}/${skills.length}` : `已就绪 ${installedCount}/${skills.length}`}
         </span>
       </header>
       {error !== '' && <p className="cqaiResearch-error" role="alert">{error}</p>}
@@ -122,7 +122,7 @@ function ResearchPanel() {
       </div>
       <p className="cqaiResearch-note">
         技能来自 {UPSTREAM.author} 的开源项目 {UPSTREAM.name}（{UPSTREAM.license}），
-        由 e宝工坊按原样调用，内容与版权归原作者所有。
+        随插件提供四套技能与配套文件，仅限非商业用途。部分任务需另备 Python、Pandoc 等工具。
       </p>
     </section>
   )
