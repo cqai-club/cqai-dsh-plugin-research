@@ -31,6 +31,13 @@ assert.equal(pkg.license, '(MIT AND CC-BY-NC-4.0)')
 assert.equal(upstream.revision, '6ab4b03bf70a118a1b3ee7f3263ed9f19031061b')
 assert.equal(upstream.license, 'CC-BY-NC-4.0')
 assert.equal(pkg.scripts.postinstall, undefined, 'Skill installation must not execute a network postinstall')
+assert.equal(pkg.icon, 'assets/icon.svg')
+assert.equal(pkg.exports['./locale/*.json'], './locale/*.json')
+for (const language of ['en', 'zh']) {
+  const locale = readJson(`locale/${language}.json`)
+  assert.equal(locale.meta?.title, 'e研宝')
+  assert.ok(locale.meta?.description?.trim(), `Display description is missing: ${language}`)
+}
 
 const patch = pkg.dsh?.bundle?.patch
 assert.equal(typeof patch, 'string')
@@ -47,6 +54,9 @@ assert.equal(packed.status, 0, packed.stderr || packed.stdout)
 const [tarball] = JSON.parse(packed.stdout)
 const files = new Set(tarball.files.map(file => file.path))
 const required = new Set(['package.json', 'dsh.plugin.json', 'README.md', '安装说明.md', 'LICENSE', patch])
+required.add(pkg.icon)
+required.add('locale/en.json')
+required.add('locale/zh.json')
 required.add('THIRD_PARTY.md')
 required.add('assets/academic-research-skills.manifest.json')
 for (const file of upstream.files) {
@@ -66,7 +76,7 @@ for (const target of [pkg.main, pkg.types, plugin.main, plugin.client?.main]) {
   if (target) required.add(target)
 }
 function exportTargets(value) {
-  if (typeof value === 'string') required.add(value)
+  if (typeof value === 'string' && !value.includes('*')) required.add(value)
   else if (Array.isArray(value)) value.forEach(exportTargets)
   else if (value && typeof value === 'object') Object.values(value).forEach(exportTargets)
 }
