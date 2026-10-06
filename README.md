@@ -1,5 +1,7 @@
 # cqai-dsh-plugin-research · e研宝
 
+<img src="assets/icon.svg" width="96" height="96" alt="e研宝图标：书页与放大镜" />
+
 独立源码仓库：[cqai-club/cqai-dsh-plugin-research](https://github.com/cqai-club/cqai-dsh-plugin-research)。
 
 这是 ebao-studio（易宝工坊）的学术研究工作台：查看四套技能的安装状态、预览技能内容，并复制调用指令到 e宝对话。
@@ -62,6 +64,8 @@ npm pack
 - 公开目录：`https://cqaiclub.asia/v1/plugins`
 - 管理后台：`https://cqaiclub.asia/member/dashboard/admin/plugins`
 - 后台导入文件：开发目录中的 `market/cqai-club-plugin.json`（不包含在 npm 安装包中）。
+
+原创图标源文件为 `assets/icon.svg`，市场使用配套的 512 × 512 PNG `assets/icon.png`。两者均随 npm 包打包。后台「图标地址」需指向 PNG 原图的 HTTPS 直链；portal 会通过同域图标代理供易宝工坊读取。SVG 保留用于矢量编辑与文档展示。
 
 先验证和发布公开 npm 包，再用有 `plugin:admin` 权限的账号在后台选择「新增插件 → JSON 快速添加」，粘贴导入文件。添加后生成草稿，点击「发布」才会进入公开目录。导入 JSON 不是 portal 的自动 seed 文件，也不会自动修改数据库。
 
