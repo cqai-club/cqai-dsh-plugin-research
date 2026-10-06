@@ -4,6 +4,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { createElement, useEffect, useState } from 'react'
+import researchIcon from '../../assets/icon.svg'
 import {
   RESEARCH_PANEL,
   RESEARCH_SKILLS,
@@ -131,11 +132,7 @@ function ResearchPanel() {
 function ResearchIcon({ size }: { size?: number }) {
   const edge = typeof size === 'number' ? size : 18
   return (
-    <svg width={edge} height={edge} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12 4 2.5 8.2 12 12.4l9.5-4.2L12 4Z" />
-      <path d="M7 10.5V16c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5v-5.5" />
-      <path d="M21.5 8.2v5.3" />
-    </svg>
+    <img src={researchIcon} width={edge} height={edge} style={{ display: 'block', flexShrink: 0 }} alt="" aria-hidden="true" draggable={false} />
   )
 }
 

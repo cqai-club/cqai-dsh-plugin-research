@@ -19,6 +19,7 @@ export default defineConfig([
     outDir: 'lib',
     format: 'cjs',
     platform: 'browser',
+    loader: { '.svg': 'dataurl' },
     target: 'es2022',
     fixedExtension: false,
     clean: false,
