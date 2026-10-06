@@ -2,7 +2,7 @@
   "packageName": "cqai-dsh-plugin-research",
   "displayName": "e研宝",
   "summary": "易宝工坊的学术研究工作台，提供深度研究、论文写作、同行评审和全流程编排入口；需要另外安装 academic-research-skills。",
-  "description": "## e研宝\n\n在 ebao-studio（易宝工坊）中提供学术研究工作台：查看四套学术技能的安装状态、浏览任务模式，并复制技能调用指令到 e宝对话。\n\n### 四套技能\n\n- `deep-research`：深度研究、文献综述、事实核查。\n- `academic-paper`：论文写作、修改、摘要和引用核查。\n- `academic-paper-reviewer`：同行评审、复核和方法审查。\n- `academic-pipeline`：研究、写作、评审与返修的全流程编排。\n\n### 安装与使用\n\n本插件只提供工作台和技能目录，不打包技能正文。请另外从 [academic-research-skills](https://github.com/Imbad0202/academic-research-skills) 安装以上四套技能，确保当前 Harness Profile 能识别它们。\n\n安装插件后重启 ebao-studio，打开侧边栏「e研宝」。确认四套技能已就绪，选择技能并复制调用指令，补充研究题目后发送到 e宝对话。\n\n### 兼容性\n\n目标宿主为 ebao-studio 桌面版。API 兼容版本及宿主兼容范围尚待实际市场安装验收，本条目暂不声明已验证的兼容范围。\n\n### 许可与归属\n\n插件代码采用 MIT 许可。技能内容来自 Cheng-I Wu 的 academic-research-skills，采用 CC-BY-NC-4.0 许可，内容与版权归原作者所有；使用技能内容需遵守上游许可。",
+  "description": "e研宝是易宝工坊（ebao-studio）的学术研究工作台，可查看技能安装状态、浏览任务模式，并将调用指令复制到 e宝对话。支持四套技能：deep-research 用于深度研究、文献综述和事实核查；academic-paper 用于论文写作、修改、摘要和引用核查；academic-paper-reviewer 用于同行评审、复核和方法审查；academic-pipeline 用于研究、写作、评审与返修的全流程编排。使用前需另外安装 academic-research-skills，项目地址为 https://github.com/Imbad0202/academic-research-skills，并确保当前 Harness Profile 能识别以上技能；本插件不包含技能正文。安装插件后重启易宝工坊，在侧边栏打开「e研宝」，确认四套技能已就绪，选择技能并复制调用指令，补充研究题目后发送到 e宝对话。目标宿主为易宝工坊桌面版，API 版本和宿主兼容范围尚待实际市场安装验收。插件代码采用 MIT 许可；技能内容来自 Cheng-I Wu 的 academic-research-skills，采用 CC-BY-NC-4.0 许可，版权归原作者所有，使用时需遵守上游许可。",
   "categories": [
     "tools",
     "workflow"
