@@ -65,7 +65,7 @@ npm pack
 - 管理后台：`https://cqaiclub.asia/member/dashboard/admin/plugins`
 - 后台导入文件：开发目录中的 `market/cqai-club-plugin.json`（不包含在 npm 安装包中）。
 
-市场详情按纯文本展示，导入文件中的 `description` 使用普通文字；标题、列表和链接的 Markdown 排版放在本 README 中。
+市场详情按纯文本展示，导入文件中的 `description` 使用分节标题、项目符号和编号步骤，保留阅读层次。文本行之间使用目录协议允许的 Unicode 行分隔符（JSON 中的 `\u2028`），与现有宿主的 `pre-wrap` 展示兼容；完整 Markdown 排版放在本 README 中。
 
 图标源文件为 `assets/icon.svg`，采用 24 × 24 网格、48 × 48 默认尺寸的透明底蓝色渐变线条，与易宝工坊 imagegen 插件图标风格一致。市场使用配套的 128 × 128 PNG `assets/icon.png`，两者均随 npm 包打包。后台「图标地址」需指向 PNG 原图的 HTTPS 直链；portal 会通过同域图标代理供易宝工坊读取。SVG 保留用于矢量编辑与文档展示。
 
