@@ -1,0 +1,204 @@
+name: Publish npm package
+
+# Publishing is always an explicit manual action; no push or tag publishes npm.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact stable version; must match package.json and dsh.plugin.json
+        required: true
+        type: string
+      dry_run:
+        description: Verify and pack without publishing to npm
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-cqai-dsh-plugin-research
+  cancel-in-progress: false
+
+env:
+  DSH_TELEMETRY_DISABLED: '1'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      package_name: ${{ steps.plan.outputs.package_name }}
+      version: ${{ steps.plan.outputs.version }}
+      filename: ${{ steps.pack.outputs.filename }}
+      integrity: ${{ steps.pack.outputs.integrity }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Validate the requested release
+        id: plan
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict'
+          import { readFileSync, appendFileSync } from 'node:fs'
+          const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
+          const plugin = JSON.parse(readFileSync('dsh.plugin.json', 'utf8'))
+          const version = process.env.INPUT_VERSION
+          assert.match(version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/u, 'Choose an exact stable SemVer')
+          assert.equal(pkg.name, 'cqai-dsh-plugin-research')
+          assert.equal(pkg.version, version, 'package.json version must match the input')
+          assert.equal(plugin.id, pkg.name)
+          assert.equal(plugin.version, version, 'dsh.plugin.json version must match the input')
+          appendFileSync(process.env.GITHUB_OUTPUT, `package_name=${pkg.name}\nversion=${version}\n`)
+          JS
+      - name: Install locked development dependencies
+        run: npm ci --ignore-scripts
+      - name: Typecheck, test and build
+        run: npm run check
+      - name: Verify release package contents
+        run: npm run check:release
+      - name: Pack and identify the verified build
+        id: pack
+        env:
+          PACKAGE_NAME: ${{ steps.plan.outputs.package_name }}
+          VERSION: ${{ steps.plan.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p release-artifacts
+          npm pack --ignore-scripts --json --pack-destination release-artifacts > release-artifacts/pack-manifest.json
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict'
+          import { readFileSync, appendFileSync } from 'node:fs'
+          import { createHash } from 'node:crypto'
+          const entries = JSON.parse(readFileSync('release-artifacts/pack-manifest.json', 'utf8'))
+          assert.equal(entries.length, 1)
+          const [packed] = entries
+          const filename = `${process.env.PACKAGE_NAME}-${process.env.VERSION}.tgz`
+          assert.equal(packed.name, process.env.PACKAGE_NAME)
+          assert.equal(packed.version, process.env.VERSION)
+          assert.equal(packed.filename, filename)
+          const integrity = `sha512-${createHash('sha512').update(readFileSync(`release-artifacts/${filename}`)).digest('base64')}`
+          assert.equal(packed.integrity, integrity)
+          appendFileSync(process.env.GITHUB_OUTPUT, `filename=${filename}\nintegrity=${integrity}\n`)
+          JS
+      - name: Refuse to republish an existing version
+        env:
+          PACKAGE_NAME: ${{ steps.plan.outputs.package_name }}
+          VERSION: ${{ steps.plan.outputs.version }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict'
+          import { spawnSync } from 'node:child_process'
+          const spec = `${process.env.PACKAGE_NAME}@${process.env.VERSION}`
+          const result = spawnSync('npm', ['view', spec, 'version', '--json', '--registry', 'https://registry.npmjs.org/'], { encoding: 'utf8' })
+          assert.equal(result.error, undefined, 'npm registry lookup could not run')
+          if (result.status === 0) throw new Error(`${spec} is already published; bump both manifest versions first`)
+          let failure
+          try { failure = JSON.parse(result.stdout) } catch { throw new Error('npm registry lookup failed without a structured E404; publishing is blocked') }
+          assert.equal(failure.error?.code, 'E404', 'Only an authoritative npm E404 permits a new release')
+          console.log(`${spec} is not published yet`)
+          JS
+      - name: Rehearse publishing the verified tarball
+        if: inputs.dry_run
+        env:
+          FILENAME: ${{ steps.pack.outputs.filename }}
+        run: npm publish "./release-artifacts/$FILENAME" --dry-run --ignore-scripts --access public --tag latest --registry https://registry.npmjs.org/
+      - name: Save the verified release package
+        uses: actions/upload-artifact@v7
+        with:
+          name: verified-npm-package-${{ github.run_id }}
+          path: |
+            release-artifacts/*.tgz
+            release-artifacts/pack-manifest.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Summarize verification
+        env:
+          PACKAGE_NAME: ${{ steps.plan.outputs.package_name }}
+          VERSION: ${{ steps.plan.outputs.version }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          printf 'Verified `%s@%s`. Dry run: `%s`.\n' "$PACKAGE_NAME" "$VERSION" "$DRY_RUN" >> "$GITHUB_STEP_SUMMARY"
+
+  publish:
+    needs: verify
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
+      - name: Require public source for npm provenance
+        env:
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict'
+          assert.equal(process.env.REPOSITORY_PRIVATE, 'false', 'npm provenance requires this source repository to be public')
+          JS
+      - name: Download the verified package
+        uses: actions/download-artifact@v8
+        with:
+          name: verified-npm-package-${{ github.run_id }}
+          path: release-artifacts
+      - name: Verify the downloaded tarball integrity
+        env:
+          FILENAME: ${{ needs.verify.outputs.filename }}
+          INTEGRITY: ${{ needs.verify.outputs.integrity }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict'
+          import { readFileSync } from 'node:fs'
+          import { createHash } from 'node:crypto'
+          const actual = `sha512-${createHash('sha512').update(readFileSync(`release-artifacts/${process.env.FILENAME}`)).digest('base64')}`
+          assert.equal(actual, process.env.INTEGRITY, 'The release tarball must match the verified artifact')
+          JS
+      - name: Publish the verified tarball to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          FILENAME: ${{ needs.verify.outputs.filename }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${NODE_AUTH_TOKEN:-}" ]]; then
+            echo 'Configure the NPM_TOKEN repository secret with permission to publish this package.' >&2
+            exit 1
+          fi
+          npm publish "./release-artifacts/$FILENAME" --ignore-scripts --access public --tag latest --provenance --registry https://registry.npmjs.org/
+      - name: Verify the published package
+        env:
+          PACKAGE_NAME: ${{ needs.verify.outputs.package_name }}
+          VERSION: ${{ needs.verify.outputs.version }}
+          INTEGRITY: ${{ needs.verify.outputs.integrity }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict'
+          import { spawnSync } from 'node:child_process'
+          import { appendFileSync } from 'node:fs'
+          const spec = `${process.env.PACKAGE_NAME}@${process.env.VERSION}`
+          const result = spawnSync('npm', ['view', spec, '--json', '--registry', 'https://registry.npmjs.org/'], { encoding: 'utf8' })
+          assert.equal(result.error, undefined, 'npm registry verification could not run')
+          assert.equal(result.status, 0, 'Published npm metadata could not be read')
+          const published = JSON.parse(result.stdout)
+          assert.equal(published.name, process.env.PACKAGE_NAME)
+          assert.equal(published.version, process.env.VERSION)
+          assert.equal(published.dist?.integrity, process.env.INTEGRITY)
+          assert.equal(published.dsh?.bundle?.patch, './cordis.patch.yml')
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, `Published and verified \`${spec}\` with npm provenance.\n`)
+          JS
